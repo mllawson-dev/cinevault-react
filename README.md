@@ -1,53 +1,42 @@
-# CineVault — Film Discovery & Watchlist
+# CineVault
 
-Independent portfolio refinement of a Frontend Simplified React course final. Category: Digital Product.
+A film-discovery and watchlist app: browse curated collections or search the OMDb catalogue, read a film's details, and save it to a watchlist without creating an account.
+
+**[Live site](https://cinevault-mll.vercel.app/)** · **[Case study](https://www.mll-creativeeng.com/case-studies/cinevault/)**
+
+CineVault started as my final project for the Frontend Simplified React course. I then rebuilt it on Vite and refined the interface, data handling and accessibility for my portfolio.
+
+## Engineering
+
+- **Server-side API key.** The browser calls `/api/movies`; `server/movies.mjs` adds the OMDb key on the server, so no credential ships to the client. The same handler runs as a Vercel function (`api/movies.js`) and as Vite dev middleware.
+- **Resilient requests.** Inputs are validated, upstream calls time out, identical concurrent requests are shared, and responses are cached for five minutes.
+- **Superseded searches are cancelled.** Collection enrichment runs four requests at a time and keeps the films that succeed if others fail.
+- **State.** React Context separates discovery, watchlist and theme. Watchlist and theme persist in the browser, with an in-memory fallback.
+- **Accessible dialogs.** Native `<dialog>` elements contain focus and return it to the control that opened them.
+
+## Quality checks
+
+```sh
+npm test        # Node test runner: 8 server and data tests
+npm run build
+```
 
 ## Run locally
 
-Requires Node 22.12+.
+Requires Node 22.12+ and a free [OMDb API key](https://www.omdbapi.com/apikey.aspx).
 
-1. Extract the ZIP, then use VS Code's **File → Open Folder** to open the extracted `cinevault` folder (the one containing `package.json`).
-2. Open **Terminal → New Terminal** and run `npm ci`.
-3. Copy `.env.example` to `.env.local` and set `OMDB_API_KEY` to your activated OMDb key. Alternatively, run `python3 scripts/set-omdb-key.py` to enter it privately; this option requires Python 3.
-4. Run `npm start`, then open http://127.0.0.1:4181/.
+```sh
+npm ci
+cp .env.example .env.local   # then add your key to OMDB_API_KEY
+npm start                    # http://127.0.0.1:4181/
+```
 
-Your API key is omitted from the source archive and browser bundle. Enter it again when setting up the extracted project. Restart the development or preview server whenever you change the key.
+To deploy on Vercel, set `OMDB_API_KEY` as an environment variable (no `VITE_` prefix).
 
-## Build and verify
+## Scope
 
-- `npm run build` — production bundle in dist.
-- `npm run preview` — serves the production bundle plus the local API middleware.
-- `npm test` — data-service and server-endpoint tests.
-- `node tests/browser.mjs` — optional fixture-based browser flow checks; requires installed Google Chrome and an environment that permits launching it. Start the local server first.
+Film data and posters come from OMDb. CineVault is not affiliated with IMDb or any streaming service. There are no accounts or cross-device sync; trailer links open YouTube searches.
 
-The browser runner cannot launch Chrome inside this Codex sandbox. Interaction and responsive checks were performed with the in-app browser. See QA-REPORT.md for verified scope.
+---
 
-## Architecture
-
-- React Context separates discovery, watchlist, and theme state.
-- The client calls /api/movies; no credential is shipped to the browser.
-- server/movies.mjs validates inputs, times out upstream calls, coalesces concurrent identical requests, sanitises service errors, and caches responses for five minutes.
-- api/movies.js adapts the shared handler to a Vercel Node function.
-- vite.config.js exposes the same endpoint during local development and preview.
-- Client requests cancel and ignore superseded work. Four workers enrich each collection while retaining successful films after partial failures.
-- Native dialogs provide focus containment; dismissal restores focus to a persistent opening control.
-- Search supports OMDb pagination, up to the API's 100-page limit. Sorting applies to loaded results on the current page.
-- Watchlists and themes persist in this browser, with an in-memory fallback when storage is unavailable.
-
-## Hosting preparation
-
-This edition needs a server endpoint; uploading dist alone is insufficient for film data.
-
-For Vercel, use the included configuration and set OMDB_API_KEY as a server environment variable. Do not use a VITE_ prefix. The site has not been deployed. API caching is bounded and local to each server process, with public responses cacheable for five minutes; it is not a shared durable cache. A larger release should add host-level rate limits and quota monitoring appropriate to the expected traffic.
-
-## Product scope and provenance
-
-Curated collections are editorial selections, not live rankings. Film information, ratings, and posters are provided by OMDb. CineVault is not affiliated with IMDb or a streaming service. Trailer links open YouTube searches. There are no accounts, cross-device sync, personalised recommendations, or active contact submissions. No client, research outcomes, or commercial metrics are claimed.
-
-The /about project notes explain the brief, product journey, design decisions, engineering approach, and limitations. The existing typography and cinematic palette are retained; new styles add responsive layout and interaction tokens in src/styles/upgrade.css.
-
-## Official references
-
-- [OMDb API parameters and data attribution](https://www.omdbapi.com/)
-- [Vite documentation](https://vite.dev/guide/)
-- [Native dialog behaviour](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog)
+Designed and built by **Michael L. Lawson**, design engineer and creative developer · [mll-creativeeng.com](https://www.mll-creativeeng.com) · [LinkedIn](https://www.linkedin.com/in/michael-lawson-a7707924)
